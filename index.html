@@ -2,132 +2,167 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>D3 Line Graph with Gradient</title>
+        <title>D3 Line Graph</title>
         <script type="text/javascript" src="d3/d3.js"></script>
         <style>
-        	
+            
         body {
-        	margin: auto;
-        	width: 960px;
+            margin: auto;
+            width: 960px;
         }
         
         svg {
-        	font: 10px sans-serif;
+            font: 10px sans-serif;
         }
         
-        .axis path,
-        .axis line {
-        	fill: none;
-        	stroke: #000;
-        	shape-rendering: crispEdges;
+        .axis path,         /* selects all path elements inside elements with class="axis" */
+        .axis line {        /* selects all line elements inside elements with class="axis" */
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
         }
         
-        .line {
-        	fill: none;
-        	stroke: url(#temperature-gradient);
-        	stroke-width: 3px;
+        .line {             /* all elements with class="line" */
+            fill: none;
+            stroke: steelblue;
+            stroke-width: 3px;
         }
         
         </style>
     </head>
     <body>
-    	    
+            
         <script type="text/javascript">    
-    	    	
+                
         var margin = {top: 20, right: 20, bottom: 30, left: 60},
-        	width = 960 - margin.left - margin.right,
-        	height = 500 - margin.top - margin.bottom;
-        	
+            width = 960 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+            
         var x = d3.time.scale()
-        	.range([0, width]);
-        	
+            .range([0, width]);
+            
         var y = d3.scale.linear()
-        	.range([height, 0]);
-        	
+            .range([height, 0]);
+            
         var xAxis = d3.svg.axis()
-        	.scale(x)
-        	.orient("bottom");
-        	
+            .scale(x)
+            .orient("bottom");
+            
         var yAxis = d3.svg.axis()
-        	.scale(y)
-        	.orient("left");
-        	
-        var line = d3.svg.line()	// returns a path generator; is both an object & a fxn
-        	.interpolate("basis")
-        	.x(function(d) { return x(d.time); })
-        	.y(function(d) { return y(d.value); });
+            .scale(y)
+            .orient("left");
+            
+        var line = d3.svg.line()    // returns a path generator; is both an object & a fxn
+            .interpolate("basis")
+            .x(function(d) { return x(d.time); })
+            .y(function(d) { return y(d.value); });
             
         var svg = d3.select("body").append("svg")
-        	.attr("width", width + margin.left + margin.right)
-        	.attr("height", height + margin.top + margin.bottom)
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
           .append("g")
-          	.attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+            .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
         
-        svg.append("defs").append("clipPath")
-        	.attr("id", "clip")
-          .append("rect")
-          	.attr("width", width)
-          	.attr("height", height);
+        d3.json("cincy weather/cincyWeather1993.json", function(error, data) {
+
+            data.forEach(function(d) {
+              d.time = +d.time;
+              d.time *= 1000;
+              d.value = + d.value;
+            });
         
-        d3.json("cincy weather/cincyWeather2013.json", function(error, data) {
-
-            //data = data["data"]
-
-        	data.forEach(function(d) {
-        	  d.time = +d.time;
-        	  d.time *= 1000;
-        	  d.value = + d.value;
-        });
-		
-		// set the input domain
+        // set the input domain
         x.domain(d3.extent(data, function(d) { return d.time; }) );
         y.domain(d3.extent(data, function(d) { return d.value; }));
-
-        svg.append("linearGradient") 			// add our linear gradient
-        	.attr("id", "temperature-gradient") // set our anchor for the CSS
-        	.attr("gradientUnits", "userSpaceOnUse")
-        	.attr("x1", 0).attr("y1", y(0))	// define coordinates for gradient vector 
-        	.attr("x2", 0).attr("y2", y(500))	 
-          .selectAll("stop")					// define where colors start/stop
-            .data([
-            	{offset: "0%", color: "steelblue"},
-                {offset: "50%", color: "steelblue"},
-                {offset: "80%", color: "red"},
-            	{offset: "100%", color: "red"}
-            ])
-          .enter().append("stop")				// append elements to the gradient
-        	.attr({"offset" : function(d) { return d.offset; },
-        	       "stop-color" : function(d) { return d.color; }
-        	});
         
-        // y axis	
+        // y axis   
         svg.append("g")
-        	.attr("class", "y axis")
-        	.call(yAxis)
+            .attr("class", "y axis")
+            .call(yAxis)
         
         // x axis 
-        svg.append("g")			
-			.attr({"class" : "x axis",
-				   "transform" : "translate(0, " + height + ")"
-			})
-			.call(xAxis);
-        
-        // draw the line  	
-        /*svg.append("path")
-        	.datum(data)
-        	.attr({"class" : "line",
-        	       "d" : line
-        	});*/
-        	
-        var path = svg.append("g")
-        	.attr("clip-path", "url(#clip)")
-          .append("path")
-          	.datum(data)
-          	.attr("class", "line")
-          	.attr("d", line);
-        	
+        svg.append("g")         
+            .attr("class", "x axis")
+            .attr("transform", "translate(0, " + height + ")")
+            .call(xAxis);
+          
+        svg.append("path")
+            .data(data) //connects visual domain & data domain. returns new data-bound selection
+            .attr("class", "line") // "Update" mode
+            .attr("d", line(data)); // the "d" attribute - defines shape of path - contains a series of commands and parameters ( line = d3.svg.line().interpolate().x( d.time ).y( d.value ) )
+            
         });
+
+        function updateData() { 
+            d3.json("cincy weather/cincyWeather2013.json", function(error, data) {
+                data.forEach(function(d) {
+                d.time = +d.time;
+                d.time *= 1000;
+                d.value = + d.value;
+                });
+
+            x.domain(d3.extent(data, function(d) { return d.time; }));
+            //y.domain(d3.extent(data, function(d) { return d.value; }));
+            y.domain([-250,400])
+        
+            var svg = d3.select("body").transition();
+        
+            svg.select(".line")
+                .duration(1000)
+                .attr("d", line(data))
+                .style("stroke", "red")
+            svg.select(".x.axis")
+                .duration(750)
+                .call(xAxis);
+            svg.select(".y.axis")
+                .duration(750)
+                .call(yAxis);
+        
+            });
+        
+        }
+
+        function revertData() { 
+            d3.json("cincy weather/cincyWeather1993.json", function(error, data) {
+                data.forEach(function(d) {
+                d.time = +d.time;
+                d.time *= 1000;
+                d.value = + d.value;
+                });
+
+            x.domain(d3.extent(data, function(d) { return d.time; }));
+            //y.domain(d3.extent(data, function(d) { return d.value; }));
+            y.domain([-250,400])
+        
+            var svg = d3.select("body").transition();
+        
+            svg.select(".line")
+                .duration(1000)
+                .attr("d", line(data))
+                .style("stroke", "steelblue")
+            svg.select(".x.axis")
+                .duration(1000)
+                .call(xAxis);
+            svg.select(".y.axis")
+                .duration(750)
+                .call(yAxis);
+        
+            });
+        
+        }
         
         </script>
+
+        <div id="option">
+            <input name="updateButton"
+                   type="button"
+                   value="Update"
+                   onclick="updateData()"/>
+            <input name="revertButton"
+                   type="button"
+                   value="Revert"
+                   onclick="revertData()"/>    
+        </div>
+
     </body>
 </html>
