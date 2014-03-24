@@ -33,7 +33,9 @@
     <body>
             
         <script type="text/javascript">    
-                
+        
+        var data=[];
+
         var margin = {top: 20, right: 20, bottom: 30, left: 60},
             width = 960 - margin.left - margin.right,
             height = 500 - margin.top - margin.bottom;
@@ -62,106 +64,80 @@
             .attr("height", height + margin.top + margin.bottom)
           .append("g")
             .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
-        
-        d3.json("cincy weather/cincyWeather1993.json", function(error, data) {
 
+        function render(data) {
             data.forEach(function(d) {
-              d.time = +d.time;
-              d.time *= 1000;
-              d.value = + d.value;
-            });
-        
-        // set the input domain
-        x.domain(d3.extent(data, function(d) { return d.time; }) );
-        y.domain(d3.extent(data, function(d) { return d.value; }));
-        
-        // y axis   
-        svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis)
-        
-        // x axis 
-        svg.append("g")         
-            .attr("class", "x axis")
-            .attr("transform", "translate(0, " + height + ")")
-            .call(xAxis);
-          
-        svg.append("path")
-            .data(data) //connects visual domain & data domain. returns new data-bound selection
-            .attr("class", "line") // "Update" mode
-            .attr("d", line(data)); // the "d" attribute - defines shape of path - contains a series of commands and parameters ( line = d3.svg.line().interpolate().x( d.time ).y( d.value ) )
-            
-        });
-
-        function updateData() { 
-            d3.json("cincy weather/cincyWeather2013.json", function(error, data) {
-                data.forEach(function(d) {
                 d.time = +d.time;
                 d.time *= 1000;
-                d.value = + d.value;
-                });
-
-            x.domain(d3.extent(data, function(d) { return d.time; }));
-            //y.domain(d3.extent(data, function(d) { return d.value; }));
-            y.domain([-250,400])
-        
-            var svg = d3.select("body").transition();
-        
-            svg.select(".line")
-                .duration(1000)
-                .attr("d", line(data))
-                .style("stroke", "red")
-            svg.select(".x.axis")
-                .duration(750)
-                .call(xAxis);
-            svg.select(".y.axis")
-                .duration(750)
-                .call(yAxis);
-        
+                d.value = +d.value;
             });
+
+            // set the input domain
+            x.domain(d3.extent(data, function(d) { return d.time; }));
+            y.domain(d3.extent(data, function(d) { return d.value; }));
         
+            // y axis   
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(yAxis)
+        
+            // x axis 
+            svg.append("g")         
+                .attr("class", "x axis")
+                .attr("transform", "translate(0, " + height + ")")
+                .call(xAxis);
+          
+            svg.append("path")
+                .data(data) 
+                .attr("class", "line") 
+                .attr("d", line(data));
         }
 
-        function revertData() { 
-            d3.json("cincy weather/cincyWeather1993.json", function(error, data) {
-                data.forEach(function(d) {
+        d3.json("cincy weather/cincyWeather2000.json", function(error, data) {
+            render(data);
+        });
+
+        function randomYear() {
+            var year = 1990 + Math.round(Math.random() * 22);
+            var y = year.toString();
+            return y;
+        }
+
+        function update(data) {
+            data.forEach(function(d) {
                 d.time = +d.time;
                 d.time *= 1000;
                 d.value = + d.value;
-                });
+            });
 
-            x.domain(d3.extent(data, function(d) { return d.time; }));
-            //y.domain(d3.extent(data, function(d) { return d.value; }));
-            y.domain([-250,400])
-        
+            x.domain(d3.extent(data, function(d) { return d.time; }) );
+            y.domain(d3.extent(data, function(d) { return d.value; }));
+
             var svg = d3.select("body").transition();
-        
+
             svg.select(".line")
                 .duration(1000)
                 .attr("d", line(data))
-                .style("stroke", "steelblue")
             svg.select(".x.axis")
-                .duration(1000)
-                .call(xAxis);
+                .duration(750)
+                .call(xAxis)
             svg.select(".y.axis")
                 .duration(750)
                 .call(yAxis);
-        
+        }
+
+
+        function load() {
+            var yr = randomYear();
+            d3.json("cincy weather/cincyWeather"+yr+".json", function(error, data) {
+                update(data);
             });
-        
         }
         
         </script>
 
-        <div id="option">
-            <input name="updateButton"
-                   type="button"
-                   value="Update"
-                   onclick="updateData()"/>
-            <input name="revertButton"
-                   type="button"
-                   value="Revert"
-                   onclick="revertData()"/>    
+        <div class="control-group">
+            <button onclick="load()">Load JSON Data</button>
         </div>
 
     </body>
