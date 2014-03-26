@@ -16,13 +16,13 @@
         }
         
         .axis path,         /* selects all path elements inside elements with class="axis" */
-        .axis line {        /* selects all line elements inside elements with class="axis" */
+        .axis line {        
             fill: none;
             stroke: #000;
             shape-rendering: crispEdges;
         }
         
-        .line {             /* all elements with class="line" */
+        .line {           
             fill: none;
             stroke: steelblue;
             stroke-width: 3px;
@@ -98,21 +98,14 @@
             render(data);
         });
 
-        function randomYear() {
-            var year = 1990 + Math.round(Math.random() * 22);
-            var y = year.toString();
-            return y;
-        }
-
-        function update(data) {
-            
+        function update(data) {   
             data.forEach(function(d) {
                 d.time = +d.time;
                 d.time *= 1000;
                 d.value = + d.value;
             });
 
-            x.domain(d3.extent(data, function(d) { return d.time; }) );
+            x.domain(d3.extent(data, function(d) { return d.time; }));
             y.domain(d3.extent(data, function(d) { return d.value; }));
 
             var svg = d3.select("body").transition();
@@ -127,7 +120,6 @@
                 .duration(750)
                 .call(yAxis);
         }
-
 
         function load(name) {
             d3.json("http://10.0.1.2/polaris/a/scada_data/metrics/"+name+"/data/q?end=1339113540", function(error, json) {
