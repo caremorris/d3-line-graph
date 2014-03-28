@@ -36,10 +36,12 @@
         
         var data=[];
 
-        var margin = {top: 20, right: 20, bottom: 30, left: 60},
-            width = 960 - margin.left - margin.right,
-            height = 500 - margin.top - margin.bottom;
-            
+        var margin = {top: 30, right: 20, bottom: 30, left: 70},
+            width = 960 - margin.left - margin.right, // = 870
+            height = 500 - margin.top - margin.bottom; // = 440 
+            // Tufte: let nature of data suggest shape of graph 
+            // otherwise, horizontal graphics ~50% wider than tall
+
         var x = d3.time.scale()
             .range([0, width]);
             
@@ -93,7 +95,7 @@
                 .attr("d", line(data));
         }
 
-        d3.json("http://10.0.1.2/polaris/a/scada_data/metrics/East_Connector_Flow/data/q?end=1339113540", function(error, json) {
+        d3.json("http://10.0.1.2/polaris/a/scada_data/metrics/East_Connector_Flow/data/q?end=1339113540&maxData=100", function(error, json) {
             var data = json["data"];
             render(data);
         });
@@ -121,32 +123,60 @@
                 .call(yAxis);
         }
 
-        function load(name) {
-            d3.json("http://10.0.1.2/polaris/a/scada_data/metrics/"+name+"/data/q?end=1339113540", function(error, json) {
+        function redraw(dbName, metricName) {
+            d3.json("http://10.0.1.2/polaris/a/"+dbName+"/metrics/"+metricName+"/data/q?end=1339113540&maxData=100", function(error, json) {
                 var data = json["data"];
                 update(data);
             });
         }
 
-        </script>
+        var dbMenu = d3.select("body")
+                        .append("div")
+                          .attr("class", "db-menu")
+                        .append("select")
+                          .attr("name", "dbMenu")
+                          .attr("onchange", "metricsMenu(this.options[this.selectedIndex].value)");
 
-        <div class="control-group">
-            <select name="menu" onchange="load(this.options[this.selectedIndex].value)">
-                <option value="East_Connector_Flow">East Connector Flow</option>
-                <option value="Industrial_Park_Meter">Industrial Park Meter</option>
-                <option value="Lake_Head">Lake Head</option>
-                <option value="Lake_PS_Discharge">Lake PS Discharge</option>
-                <option value="Lake_Pump_Runtime">Lake Pump Runtime</option>
-                <option value="Middletown_Pressure_Monitor">Middletown Pressure Monitor</option>
-                <option value="Middletown_Tank_Level">Middletown Tank Level</option>
-                <option value="Northside_Tank_Level">Northside Tank Level</option>
-                <option value="River_Head">River Head</option>
-                <option value="River_PS_Discharge">River PS Discharge</option>
-                <option value="South_PRV_Flow">South PRV Flow</option>
-                <option value="Southbank_PRV_DS_Pressure">Southbank PRV DS Pressure</option>
-                <option value="Southbank_Tank_Level">Southbank Tank Level</option>
-            </select>
-        </div>
+        // create the DB menu ("sample", "scada_data", "weather")
+        d3.json("http://10.0.1.2/polaris/a/projects", function(error, json) {
+            var data = json["data"];
+            data.forEach(function(d) {
+                dbMenu.append("option")
+                    .attr("value", d.name)
+                    .text(d.name);                
+            });
+        });
+        
+        var body = d3.select("body").insert("select")
+                .attr("id", "metricsMenu");
+        
+        function metricsMenu(databaseName) {
+            d3.json("http://10.0.1.2/polaris/a/"+databaseName+"/metrics", function(error, json) {
+                var data = json["data"];
+
+                // Enter
+                body.attr("onchange", "redraw("+databaseName+", this.options[this.selectedIndex].value)")
+                    .selectAll("option")
+                    .data(data)
+                    .enter().append("option")
+
+                //Update
+                d3.select("body").select("select#metricsMenu")
+                    .selectAll("option")
+                    .data(data)
+                    .attr("value", function(d) { return d.name; })
+                    .text(function(d) { return d.name; });
+
+                //Exit
+                d3.select("body").select("select#metricsMenu")
+                    .selectAll("option")
+                    .data(data)
+                    .exit()
+                    .remove();
+            });
+        }
+
+        </script>
 
     </body>
 </html>
