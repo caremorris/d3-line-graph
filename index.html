@@ -42,24 +42,25 @@
             // Tufte: let nature of data suggest shape of graph 
             // otherwise, horizontal graphics ~50% wider than tall
 
-        var x = d3.time.scale()
+        var x = d3.time.scale()  // scale function. x(n) maps n to a number between 0 and 870
             .range([0, width]);
             
         var y = d3.scale.linear()
             .range([height, 0]);
             
-        var xAxis = d3.svg.axis()
-            .scale(x)
-            .orient("bottom");
-            
+        var xAxis = d3.svg.axis()  // create an axis component
+            .scale(x)              // provide axis scale
+            .orient("bottom");     // place the scale & tick marks (horizontal, ticks on bottom)
+        //  can add tick formatting here                    
+        
         var yAxis = d3.svg.axis()
             .scale(y)
-            .orient("left");
+            .orient("left");       // (vertical, ticks on left)
             
         var line = d3.svg.line()    // returns a path generator; is both an object & a fxn
             .interpolate("basis")
-            .x(function(d) { return x(d.time); }) // x is a function. it maps d.time to a pixel value between (0, width)
-            .y(function(d) { return y(d.value); }); // y is a function. it maps d.value to a pixel value between (0, height) :)
+            .x(function(d) { return x(d.time); }) // x is a (time) scale function. it returns a number between 0 and width
+            .y(function(d) { return y(d.value); }); // y is a (linear) scale function
             
         var svg = d3.select("body").append("svg")
             .attr("width", width + margin.left + margin.right)
@@ -79,9 +80,9 @@
             y.domain(d3.extent(data, function(d) { return d.value; }));
         
             // y axis   
-            svg.append("g")
+            svg.append("g") // having a g element to contain all SVG elements related to an axis -- requirement of d3 axis component
                 .attr("class", "y axis")
-                .call(yAxis)
+                .call(yAxis); // invokes the yAxis object with the current selection (g?) passed in as an argument. 
         
             // x axis 
             svg.append("g")         
