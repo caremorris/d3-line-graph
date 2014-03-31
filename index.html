@@ -149,7 +149,7 @@
         
         var body = d3.select("body").insert("select")
                 .attr("id", "metricsMenu");
-        
+
         function metricsMenu(databaseName) {
             d3.json("http://10.0.1.2/polaris/a/"+databaseName+"/metrics", function(error, json) {
                 var data = json["data"];
@@ -160,14 +160,14 @@
                     .data(data)
                     .enter().append("option")
 
-                //Update
+                // Update
                 d3.select("body").select("select#metricsMenu")
                     .selectAll("option")
                     .data(data)
                     .attr("value", function(d) { return d.name; })
                     .text(function(d) { return d.name; });
 
-                //Exit
+                // Exit
                 d3.select("body").select("select#metricsMenu")
                     .selectAll("option")
                     .data(data)
