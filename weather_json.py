@@ -13,7 +13,7 @@ def getTimeFromLine(line):
     d = datetime(yyyy, mm, dd, h, m, s, 0)
     return(calendar.timegm(d.utctimetuple()))
 
-for i in range(1985, 1986):
+for i in range(1989, 2014):
 
     i = str(i)
     cincinnati = locationYear(724297, 93812, i)
