@@ -24,7 +24,7 @@ for i in range(1989, 2014):
         # Open the gzip file (in bytes mode)
         with gzip.open(file, 'rb') as f:
             
-            with open('/Users/carolyn/Documents/D3js/json project/cincyWeather'+ i +'.json', 'w') as outfile:
+            with open('~/line-chart/data/cincyWeather'+ i +'.json', 'w') as outfile:
 
                 for line in f:
                     time = getTimeFromLine(line)
