@@ -1,5 +1,5 @@
 body {
-  font: 10px sans-serif;
+  font: 12px sans-serif;
 }
 
 .axis path,
@@ -17,4 +17,12 @@ body {
   fill: none;
   stroke: steelblue;
   stroke-width: 1.5px;
+}
+
+svg {
+	padding: 20px;
+}
+
+.control-group {
+	margin-left: 80px;
 }

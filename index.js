@@ -56,7 +56,15 @@ d3.json("data/cincyWeather1990.json", function(error, data) {
         .attr("dy", ".71em")
         .style("text-anchor", "end")
         .text("Temperature (Fahrenheit)");
-    
+
+    svg.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px") 
+        .style("text-decoration", "underline")  
+        .text("Temperature in Cincinnati");
+
     // line
     svg.append("path")
         .data(data) 
