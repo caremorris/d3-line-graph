@@ -65,7 +65,6 @@ d3.json("data/cincyWeather1990.json", function(error, data) {
         .attr("d", line(data));
 });
 
-
 function update(data) {   
     data.forEach(function(d) {
         d.time = +d.time;
@@ -90,7 +89,31 @@ function update(data) {
 }
 
 function load(name) {
-    d3.json("data/"+name+".json", function(error, json) {
+    d3.json("data/cincyWeather"+name+".json", function(error, json) {
         update(json);
     });
+}
+
+// Dynamic select menu
+var select, options;
+d3.json("data/years.json", function(error, json) {
+    var data = json["data"];
+    
+    select = d3.select(".control-group")
+        .append("select")
+        .on("change", change);
+
+    options = select.selectAll("option").data(data);
+
+    options.enter()
+        .append("option")
+        .text(function(d) { return d.year; });
+    }
+);
+
+function change() {
+    var selectedIndex = select.property('selectedIndex'),
+        data          = options[0][selectedIndex].__data__;
+
+    load(data.year);
 }
