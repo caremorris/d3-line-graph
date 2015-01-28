@@ -34,11 +34,11 @@ d3.json("data/cincyWeather1990.json", function(error, data) {
     data.forEach(function(d) {
         d.time = +d.time;
         d.time *= 1000;
-        d.value = +d.value;
+        d.value = +d.value / 10;
     });
     // set the input domain. min and max.
     x.domain(d3.extent(data, function(d) { return d.time; }));
-    y.domain(d3.extent(data, function(d) { return d.value; }));
+    y.domain(d3.extent(data, function(d) { return (d.value); }));
 
     // x axis 
     svg.append("g")         
@@ -55,7 +55,7 @@ d3.json("data/cincyWeather1990.json", function(error, data) {
         .attr("y", 6)
         .attr("dy", ".71em")
         .style("text-anchor", "end")
-        .text("Temperature (Fahrenheit)");
+        .text("Temperature (Celsius)");
 
     svg.append("text")
         .attr("x", (width / 2))             
@@ -77,7 +77,7 @@ function update(data) {
     data.forEach(function(d) {
         d.time = +d.time;
         d.time *= 1000;
-        d.value = + d.value;
+        d.value = + d.value / 10;
     });
 
     x.domain(d3.extent(data, function(d) { return d.time; }));
