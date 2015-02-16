@@ -1,9 +1,3 @@
-This repo contains:
+A Web-based data visualization of historical temperature data for Cincinnati. The user can select a year and the temperature data is displayed as a line chart. 
 
-* a d3 line chart of temperature data for Cincinnati
-
-* a python script that gets the Cincinnati temperature data from the NOAA website and converts it to JSON 
-
-* a python script that inserts the data into an SQLite database, creating one if it doesn't exist
-
-* the temperature data JSON files
+The python script "tempoJSON.py" gets the Cincinnati temperature data from the NOAA ftp server and converts it into JSON. It can also insert the data into an SQLite database, creating one if it doesn't exist.
